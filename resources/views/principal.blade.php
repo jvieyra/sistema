@@ -9,8 +9,10 @@
     <meta name="author" content="Incanatoit.com">
     <meta name="keyword" content="Sistema ventas Laravel Vue Js, Sistema compras Laravel Vue Js">
     <link rel="shortcut icon" href="img/favicon.png">
+    <meta name="userId" content="{{ Auth::check() ? Auth::user()->id:'' }}">
     <title>Sistema Ventas - IncanatoIT</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js">
     <!-- Icons -->
     <link href="css/plantilla.css" rel="stylesheet">
 </head>
@@ -34,36 +36,24 @@
             </li>
         </ul>
         <ul class="nav navbar-nav ml-auto">
-            <li class="nav-item d-md-down-none">
-                <a class="nav-link" href="#" data-toggle="dropdown">
-                    <i class="icon-bell"></i>
-                    <span class="badge badge-pill badge-danger">5</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <div class="dropdown-header text-center">
-                        <strong>Notificaciones</strong>
-                    </div>
-                    <a class="dropdown-item" href="#">
-                        <i class="fa fa-envelope-o"></i> Ingresos
-                        <span class="badge badge-success">3</span>
-                    </a>
-                    <a class="dropdown-item" href="#">
-                        <i class="fa fa-tasks"></i> Ventas
-                        <span class="badge badge-danger">2</span>
-                    </a>
-                </div>
-            </li>
+          <notification :notifications="notifications"></notification>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                     <img src="img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-                    <span class="d-md-down-none">admin </span>
+                    <span class="d-md-down-none">{{ Auth::user()->usuario }} </span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <div class="dropdown-header text-center">
                         <strong>Cuenta</strong>
                     </div>
-                    <a class="dropdown-item" href="#"><i class="fa fa-user"></i> Perfil</a>
-                    <a class="dropdown-item" href="#"><i class="fa fa-lock"></i> Cerrar sesión</a>
+                    
+                    <a class="dropdown-item" href="{{ route('logout') }}" 
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fa fa-lock"></i> Cerrar sesión</a>
+                    
+                    <form id="logout-form" action="{{ route('logout' )}}" method="POST" style="display:none;">
+                      {{ csrf_field() }}
+                    </form>
                 </div>
             </li>
         </ul>
@@ -71,7 +61,17 @@
 
     <div class="app-body">
         
-        @include('plantilla.sidebar')
+        @if (Auth::check())
+         @if(Auth::user()->idrol == 1)
+            @include('plantilla.sidebaradministrador')
+          @elseif(Auth::user()->idrol == 2)
+            @include('plantilla.sidebarvendedor')
+          @elseif(Auth::user()->idrol == 3)
+            @include('plantilla.sidebaralmacenero')
+          @else
+          
+          @endif
+        @endif
         <!-- Contenido Principal -->
         @yield('contenido')
         <!-- /Fin del contenido principal -->
